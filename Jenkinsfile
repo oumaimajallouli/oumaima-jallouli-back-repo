@@ -2,8 +2,13 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17'           // Nom du JDK configuré dans Jenkins
-        maven 'Maven3'        // Nom de Maven configuré dans Jenkins
+        jdk 'jdk-17-temurin'
+        maven 'Maven_3.9.6'
+    }
+
+    environment {
+        JAVA_HOME = "${tool 'jdk-17-temurin'}"
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -15,23 +20,23 @@ pipeline {
             }
         }
 
-              stage('Build with Maven') {
+        stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                sh 'java -version'
+                sh 'mvn clean install -DskipTests'
             }
         }
- 
+
         stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
         }
- 
     }
 
     post {
         success {
-            echo '✅ Build réussi.'
+            echo '✅ Build et tests réussis !'
         }
         failure {
             echo '❌ Échec du pipeline.'
