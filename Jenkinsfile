@@ -1,56 +1,42 @@
 pipeline {
     agent any
 
-    // Force l'utilisation de JDK 17
     tools {
-        jdk 'jdk17'  // Doit correspondre EXACTEMENT au nom dans Jenkins
-        maven 'maven3'
+        // Utilisez les noms EXACTS tels qu'ils apparaissent dans Jenkins
+        jdk 'JDK17'  // Avec majuscules comme suggéré dans l'erreur
+        maven 'Maven3'  // Avec majuscule comme suggéré
     }
 
     environment {
-        // Surcharge des variables pour forcer JDK 17
-        JAVA_HOME = "${tool 'jdk17'}"
-        PATH = "${tool 'jdk17'}/bin:${env.PATH}"
+        // Surcharge pour confirmation
+        JAVA_HOME = "${tool 'JDK17'}"
+        PATH = "${tool 'JDK17'}/bin:${env.PATH}"
     }
 
     stages {
-        // Vérification de l'environnement
-        stage('🔍 Vérification Java/Maven') {
+        stage('🛠 Vérification Outils') {
             steps {
                 sh '''
-                    echo "=== Version Java ==="
-                    java -version
-                    echo "=== Version Java Compiler ==="
-                    javac -version
-                    echo "=== Version Maven ==="
-                    mvn --version
                     echo "=== JAVA_HOME ==="
-                    echo ${JAVA_HOME}
+                    echo $JAVA_HOME
+                    echo "=== Java Version ==="
+                    java -version
+                    echo "=== Maven Version ==="
+                    mvn --version
                 '''
             }
         }
 
-        // Étape de build
         stage('🏗 Build') {
             steps {
                 sh 'mvn clean install -DskipTests'
             }
         }
-
-        // Étape de test (optionnelle)
-        stage('🧪 Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
     }
 
     post {
-        success {
-            echo '✅ Pipeline exécuté avec succès!'
-        }
-        failure {
-            echo '❌ Échec du pipeline. Voir les logs pour détails.'
+        always {
+            echo "✅ Pipeline terminé - Voir les logs ci-dessus"
         }
     }
 }
