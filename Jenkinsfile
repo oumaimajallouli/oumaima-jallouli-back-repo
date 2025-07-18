@@ -15,18 +15,18 @@ pipeline {
             }
         }
 
-        stage('Build with Maven') {
+              stage('Build with Maven') {
             steps {
-                sh 'java -version'
-                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean package'
             }
         }
-
+ 
         stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
         }
+ 
     }
 
     post {
