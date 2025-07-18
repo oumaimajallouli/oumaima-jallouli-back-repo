@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'Maven3'
-        jdk 'JDK17'  // Doit correspondre exactement au nom dans Jenkins
+        jdk 'JDK17'  // Assure-toi que le nom correspond à la configuration Jenkins
     }
 
     stages {
@@ -14,7 +14,6 @@ pipeline {
                     url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'
             }
         }
-
 
         stage('Build') {
             steps {
