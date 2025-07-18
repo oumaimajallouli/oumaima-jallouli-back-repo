@@ -15,20 +15,6 @@ pipeline {
             }
         }
 
-        stage('Verify Java Version') {
-            steps {
-                script {
-                    def javaHome = tool 'JDK17'  // Récupère le chemin de JDK17
-                    env.JAVA_HOME = javaHome     // Force JAVA_HOME
-                    env.PATH = "${javaHome}/bin:${env.PATH}"  // Ajoute JDK17 au PATH
-                    
-                    // Vérification
-                    sh 'java -version'
-                    sh 'javac -version'
-                    sh 'mvn --version'
-                }
-            }
-        }
 
         stage('Build') {
             steps {
