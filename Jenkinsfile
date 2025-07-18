@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk-17-temurin'
-        maven 'Maven_3.9.6'
+        jdk 'jdk17'
+        maven 'Maven3'
     }
 
     environment {
-        JAVA_HOME = "${tool 'jdk-17-temurin'}"
+        JAVA_HOME = "${tool 'jdk17'}"
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
