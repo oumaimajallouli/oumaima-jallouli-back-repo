@@ -1,27 +1,44 @@
 pipeline {
     agent any
 
+    // Force l'utilisation de JDK 17
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'  // Assure-toi que le nom correspond à la configuration Jenkins
+        jdk 'jdk17'  // Doit correspondre EXACTEMENT au nom dans Jenkins
+        maven 'maven3'
+    }
+
+    environment {
+        // Surcharge des variables pour forcer JDK 17
+        JAVA_HOME = "${tool 'jdk17'}"
+        PATH = "${tool 'jdk17'}/bin:${env.PATH}"
     }
 
     stages {
-        stage('Checkout') {
+        // Vérification de l'environnement
+        stage('🔍 Vérification Java/Maven') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'github-token',
-                    url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'
+                sh '''
+                    echo "=== Version Java ==="
+                    java -version
+                    echo "=== Version Java Compiler ==="
+                    javac -version
+                    echo "=== Version Maven ==="
+                    mvn --version
+                    echo "=== JAVA_HOME ==="
+                    echo ${JAVA_HOME}
+                '''
             }
         }
 
-        stage('Build') {
+        // Étape de build
+        stage('🏗 Build') {
             steps {
                 sh 'mvn clean install -DskipTests'
             }
         }
 
-        stage('Test') {
+        // Étape de test (optionnelle)
+        stage('🧪 Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -30,10 +47,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build et tests réussis !'
+            echo '✅ Pipeline exécuté avec succès!'
         }
         failure {
-            echo '❌ Échec du pipeline.'
+            echo '❌ Échec du pipeline. Voir les logs pour détails.'
         }
     }
 }
