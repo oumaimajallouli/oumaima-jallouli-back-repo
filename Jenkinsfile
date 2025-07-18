@@ -11,7 +11,14 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-token',  // Remplace par ton ID de credential Jenkins si repo privé
-                    url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'
+                    url: 'https://github.com/oumaimajallouli/oumaima-jouli-back-repo.git'
+            }
+        }
+
+        stage('Info versions') {
+            steps {
+                sh 'java -version'
+                sh 'mvn -version'
             }
         }
 
