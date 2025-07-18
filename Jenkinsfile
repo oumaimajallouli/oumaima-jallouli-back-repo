@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'
+        jdk 'JDK17'
         maven 'Maven3'
     }
 
     environment {
-        JAVA_HOME = "${tool 'jdk17'}"
+        JAVA_HOME = "${tool 'JDK17'}"
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
