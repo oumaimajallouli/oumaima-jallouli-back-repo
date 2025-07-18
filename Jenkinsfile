@@ -1,14 +1,16 @@
 pipeline {
     agent any
+
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'
+        jdk 'JDK17'           // Nom du JDK configuré dans Jenkins
+        maven 'Maven3'        // Nom de Maven configuré dans Jenkins
     }
+
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'github-token', // DOIT être valide dans Jenkins
+                    credentialsId: 'github-token',
                     url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'
             }
         }
@@ -29,7 +31,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build et tests réussis !'
+            echo '✅ Build réussi.'
         }
         failure {
             echo '❌ Échec du pipeline.'
