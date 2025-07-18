@@ -14,6 +14,14 @@ pipeline {
                     url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'  // Corrigé ici !
             }
         }
+        stage('Debug JDK') {
+    steps {
+        sh 'java -version'
+        sh 'javac -version'
+        sh 'mvn --version'
+    }
+}
+
 
         stage('Build') {
             steps {
