@@ -60,12 +60,12 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'docker-token',
-                    usernameVariable: 'oumaima540',
-                    passwordVariable: 'oumaima'
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
                         sh """
-                            echo "${oumaima}" | docker login -u "${oumaima540}" --password-stdin
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                             docker push ${DOCKER_IMAGE}:latest
                             docker push ${DOCKER_IMAGE}:${VERSION}
                             docker push ${DOCKER_IMAGE}:${env.GIT_COMMIT_SHORT}
