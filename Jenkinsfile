@@ -43,13 +43,39 @@ pipeline {
             }
         }
 
-  stage('Build Docker Image') {
+        stage('Install Docker') {
             steps {
-                sh "docker build -t back:latest ."
+                sh '''
+                    if ! [ -x "$(command -v docker)" ]; then
+                        echo "🛠️ Docker n'est pas installé, installation en cours..."
+                        apt-get update
+                        apt-get install -y ca-certificates curl gnupg
+                        install -m 0755 -d /etc/apt/keyrings
+                        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+                        chmod a+r /etc/apt/keyrings/docker.gpg
+                        echo \
+                          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+                          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+                        apt-get update
+                        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+                    else
+                        echo "✅ Docker déjà installé."
+                    fi
+                '''
             }
         }
- 
- 
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker build -t ${DOCKER_IMAGE}:latest .
+                        docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${VERSION}
+                        docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${env.GIT_COMMIT_SHORT}
+                    """
+                }
+            }
+        }
 
         stage('Push to Docker Hub') {
             steps {
