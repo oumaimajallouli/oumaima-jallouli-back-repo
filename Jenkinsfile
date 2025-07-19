@@ -43,7 +43,7 @@ pipeline {
             }
         }
 
-   stage('Build Docker Image') {
+  stage('Build Docker Image') {
 
     steps {
 
@@ -51,19 +51,24 @@ pipeline {
 
             sh '''
 
-                export PATH=$PATH:/usr/bin:/usr/local/bin
+                export PATH=$PATH:/usr/bin
 
                 docker build --no-cache \\
 
                     -t ${DOCKER_IMAGE}:latest \\
 
-                    -t ${DOCKER_IMAGE}:${VERSION} \\  '''
+                    -t ${DOCKER_IMAGE}:${VERSION} \\
+
+                    -t ${DOCKER_IMAGE}:${env.GIT_COMMIT_SHORT} .
+
+            '''
 
         }
 
     }
 
 }
+ 
  
 
         stage('Push to Docker Hub') {
