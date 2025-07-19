@@ -5,13 +5,29 @@ pipeline {
         jdk 'JDK17'
         maven 'Maven3'
     }
-    
+
+    environment {
+        DOCKER_IMAGE = 'oumaimajallouli/oumaima-app'
+        VERSION = '1.0.0'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-token',
                     url: 'https://github.com/oumaimajallouli/oumaima-jallouli-back-repo.git'
+            }
+        }
+
+        stage('Set Git Commit Short') {
+            steps {
+                script {
+                    env.GIT_COMMIT_SHORT = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
+                }
             }
         }
 
@@ -27,11 +43,33 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Build Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('SonarQube') {
-                        sh 'mvn sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.token=$SONAR_TOKEN'
+                script {
+                    sh """
+                        docker build --no-cache \\
+                            -t ${DOCKER_IMAGE}:latest \\
+                            -t ${DOCKER_IMAGE}:${VERSION} \\
+                            -t ${DOCKER_IMAGE}:${env.GIT_COMMIT_SHORT} .
+                    """
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credential',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    script {
+                        sh """
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                            docker push ${DOCKER_IMAGE}:latest
+                            docker push ${DOCKER_IMAGE}:${VERSION}
+                            docker push ${DOCKER_IMAGE}:${env.GIT_COMMIT_SHORT}
+                        """
                     }
                 }
             }
@@ -40,7 +78,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build et tests réussis !'
+            echo '✅ Build et Docker push réussis !'
         }
         failure {
             echo '❌ Échec du pipeline.'
